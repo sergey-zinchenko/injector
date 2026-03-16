@@ -24,7 +24,6 @@ import types
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from typing import (
-    TYPE_CHECKING,
     Any,
     Callable,
     Collection,
@@ -45,24 +44,7 @@ from typing import (
     overload,
 )
 
-try:
-    from typing import NoReturn
-except ImportError:
-    from typing_extensions import NoReturn
-
-# This is a messy, type-wise, because we not only have two potentially conflicting imports here
-# The easiest way to make mypy happy here is to tell it the versions from typing_extensions are
-# canonical. Since this typing_extensions import is only for mypy it'll work even without
-# typing_extensions actually installed so all's good.
-if TYPE_CHECKING:
-    from typing_extensions import Annotated, _AnnotatedAlias, get_type_hints
-else:
-    # Ignoring errors here as typing_extensions stub doesn't know about those things yet
-    try:
-        from typing import Annotated, _AnnotatedAlias, get_type_hints
-    except ImportError:
-        from typing_extensions import Annotated, _AnnotatedAlias, get_type_hints
-
+from typing import Annotated, NoReturn, _AnnotatedAlias, get_type_hints  # type: ignore[attr-defined]
 
 __author__ = 'Alec Thomas <alec@swapoff.org>'
 __version__ = '0.24.0'
@@ -108,7 +90,7 @@ _noinject_marker = object()
 InjectT = TypeVar('InjectT')
 Inject = Annotated[InjectT, _inject_marker]
 """An experimental way to declare injectable dependencies utilizing a `PEP 593`_ implementation
-in Python 3.9 and backported to Python 3.7+ in `typing_extensions`.
+in Python 3.9.
 
 Those two declarations are equivalent::
 
@@ -136,19 +118,18 @@ it may be easier to spot what are they. Those two are equivalent::
         A way to inspect how various injection declarations interact with each other.
 
 .. versionadded:: 0.18.0
-.. note:: Requires Python 3.7+.
+.. note:: Requires Python 3.9+.
 .. note::
 
     If you're using mypy you need the version 0.750 or newer to fully type-check code using this
     construct.
 
 .. _PEP 593: https://www.python.org/dev/peps/pep-0593/
-.. _typing_extensions: https://pypi.org/project/typing-extensions/
 """
 
 NoInject = Annotated[InjectT, _noinject_marker]
 """An experimental way to declare noninjectable dependencies utilizing a `PEP 593`_ implementation
-in Python 3.9 and backported to Python 3.7+ in `typing_extensions`.
+in Python 3.9.
 
 Since :func:`inject` declares all function's parameters to be injectable there needs to be a way
 to opt out of it. This has been provided by :func:`noninjectable` but `noninjectable` suffers from
@@ -175,14 +156,13 @@ two issues:
         A way to inspect how various injection declarations interact with each other.
 
 .. versionadded:: 0.18.0
-.. note:: Requires Python 3.7+.
+.. note:: Requires Python 3.9+.
 .. note::
 
     If you're using mypy you need the version 0.750 or newer to fully type-check code using this
     construct.
 
 .. _PEP 593: https://www.python.org/dev/peps/pep-0593/
-.. _typing_extensions: https://pypi.org/project/typing-extensions/
 """
 
 
@@ -791,13 +771,7 @@ def _ensure_iterable(item_or_list: Union[T, List[T]]) -> List[T]:
 
 
 def _punch_through_alias(type_: Any) -> type:
-    if (
-        sys.version_info < (3, 10)
-        and getattr(type_, '__qualname__', '') == 'NewType.<locals>.new_type'
-        or sys.version_info >= (3, 10)
-        and type(type_).__module__ == 'typing'
-        and type(type_).__name__ == 'NewType'
-    ):
+    if type(type_).__module__ == 'typing' and type(type_).__name__ == 'NewType':
         return type_.__supertype__
     elif isinstance(type_, _AnnotatedAlias) and getattr(type_, '__metadata__', None) is not None:
         return type_.__origin__

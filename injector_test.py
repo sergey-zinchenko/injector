@@ -11,7 +11,6 @@
 """Functional tests for the "Injector" dependency injection framework."""
 
 import abc
-import sys
 import threading
 import traceback
 import warnings
@@ -19,10 +18,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any, Literal, NewType, Optional, Union
 
-if sys.version_info >= (3, 9):
-    from typing import Annotated
-else:
-    from typing_extensions import Annotated
+from typing import Annotated
 
 from typing import Dict, List, NewType
 
@@ -2031,7 +2027,6 @@ def test_get_bindings_of_nested_inject_annotations() -> None:
 
 
 # Tests https://github.com/alecthomas/injector/issues/202
-@pytest.mark.skipif(sys.version_info < (3, 10), reason="Requires Python 3.10+")
 def test_get_bindings_for_pep_604():
     @inject
     def function1(a: int | None) -> None:
@@ -2255,7 +2250,6 @@ def test_module_provider_with_annotated():
 
 
 # Test for https://github.com/alecthomas/injector/issues/303
-@pytest.mark.skipif(sys.version_info < (3, 10), reason="Requires Python 3.10+")
 def test_can_inject_dataclass_with_literal_value():
     @dataclass(slots=True)
     class ServiceConfig:
