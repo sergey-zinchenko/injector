@@ -46,7 +46,6 @@ from typing import (
 
 from typing import Annotated, NoReturn, _AnnotatedAlias, get_type_hints  # type: ignore[attr-defined]
 
-
 __author__ = 'Alec Thomas <alec@swapoff.org>'
 __version__ = '0.24.0'
 __version_tag__ = ''

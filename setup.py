@@ -2,7 +2,6 @@ from setuptools import setup, Command
 import sys
 import warnings
 
-
 warnings.filterwarnings("always", module=__name__)
 
 
