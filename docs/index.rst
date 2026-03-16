@@ -21,7 +21,7 @@ PyPI (installable, stable distributions): https://pypi.org/project/injector. You
 
     pip install injector
 
-Injector works with CPython 3.6+ and PyPy 3 implementing Python 3.6+.
+Injector works with CPython 3.10+ and PyPy 3 implementing Python 3.10+.
 
 Introduction
 ------------
